@@ -1,7 +1,7 @@
 import type { IELTSWriting, IELTSScore } from '../types/ielts';
 
 const API_BASE_URL = import.meta.env.PROD 
-  ? '/api' 
+  ? window.location.origin + '/api' 
   : 'http://localhost:3000/api';
 
 export class APIService {

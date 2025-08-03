@@ -11,8 +11,8 @@ function App() {
   const { currentEssay, isLoading, submitEssay, clearError } = useWritingStore();
 
   const handleSubmit = async () => {
-    if (!currentEssay || currentEssay.wordCount < 250) {
-      alert('Please write at least 250 words before submitting.');
+    if (!currentEssay || currentEssay.wordCount < 50) {
+      alert('Please write at least 50 words before submitting.');
       return;
     }
     
@@ -70,7 +70,7 @@ function App() {
               <div className="max-w-4xl mx-auto mt-6">
                 <button
                   onClick={handleSubmit}
-                  disabled={isLoading || !currentEssay || currentEssay.wordCount < 250}
+                  disabled={isLoading || !currentEssay || currentEssay.wordCount < 50}
                   className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   {isLoading ? (
@@ -86,11 +86,18 @@ function App() {
                   )}
                 </button>
                 
-                {currentEssay && currentEssay.wordCount < 250 && (
+                {currentEssay && currentEssay.wordCount < 50 && (
                   <p className="text-sm text-red-600 mt-2 text-center">
-                    Minimum {250 - currentEssay.wordCount} more words needed
+                    Minimum {50 - currentEssay.wordCount} more words needed
                   </p>
                 )}
+                
+                {/* 调试信息 */}
+                <div className="mt-4 text-xs text-gray-500 text-center space-y-1">
+                  <p>Word count: {currentEssay?.wordCount || 0}</p>
+                  <p>Content length: {currentEssay?.content?.length || 0} chars</p>
+                  <p>Task ID: {currentEssay?.taskId || 'none'}</p>
+                </div>
               </div>
             </div>
           )}

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { IELTSWriting, IELTSScore, IELTSWritingTask } from '../types/ielts';
-import { IELTSScoringService } from '../services/openai';
+import { IELTSScoringService } from '../services/api';
 
 interface WritingState {
   // State
@@ -115,21 +115,16 @@ export const useWritingStore = create<WritingState>()(
         set({ isLoading: true, error: null });
 
         try {
-          // Check cache first
-          const cacheKey = `score_${currentEssay.content.slice(0, 100)}_${currentEssay.wordCount}`;
-          const cachedScore = localStorage.getItem(cacheKey);
+          console.log('Submitting essay:', {
+            wordCount: currentEssay.wordCount,
+            contentLength: currentEssay.content.length,
+            taskId: currentEssay.taskId
+          });
+
+          const service = IELTSScoringService.getInstance();
+          const score = await service.scoreEssay(currentEssay);
           
-          let score;
-          if (cachedScore) {
-            score = JSON.parse(cachedScore);
-          } else {
-            const service = IELTSScoringService.getInstance();
-            score = await service.scoreEssay(currentEssay);
-            
-            // Cache for 1 hour
-            localStorage.setItem(cacheKey, JSON.stringify(score));
-            setTimeout(() => localStorage.removeItem(cacheKey), 3600000);
-          }
+          console.log('Received score:', score);
 
           set((state) => ({
             isLoading: false,
@@ -141,6 +136,7 @@ export const useWritingStore = create<WritingState>()(
             currentEssay: null,
           }));
         } catch (error) {
+          console.error('Scoring failed:', error);
           set({
             isLoading: false,
             error: error instanceof Error ? error.message : 'Failed to score essay',

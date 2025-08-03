@@ -76,9 +76,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.KIMI_API_KEY || process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      console.error('OpenAI API key not configured');
+      console.error('API key not configured');
       return res.status(500).json({ 
         error: 'Service temporarily unavailable. Please try again later.' 
       });
@@ -110,14 +110,22 @@ Provide scoring in this JSON format:
   ]
 }`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // 支持Kimi API
+    const isKimi = apiKey.startsWith('sk-kimi');
+    const apiUrl = isKimi 
+      ? 'https://api.moonshot.cn/v1/chat/completions'
+      : 'https://api.openai.com/v1/chat/completions';
+    
+    const model = isKimi ? 'moonshot-v1-8k' : 'gpt-4o-mini';
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: model,
         messages: [
           {
             role: 'system',
