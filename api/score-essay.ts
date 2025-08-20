@@ -68,7 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { content, wordCount, taskType = 'Task 2' } = req.body as IELTSWriting;
+    const { content, wordCount, taskType = 'Task 2', taskTitle = 'General Task' } = req.body as IELTSWriting & { taskTitle?: string };
 
     if (!content || content.trim().length < 50) {
       return res.status(400).json({ 
@@ -85,6 +85,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const prompt = `Please score this IELTS ${taskType} essay with detailed analysis:
+
+Task: ${taskTitle}
 
 Essay Content:
 ${content}
@@ -110,8 +112,8 @@ Provide scoring in this JSON format:
   ]
 }`;
 
-    // 支持Kimi API
-    const isKimi = apiKey.startsWith('sk-kimi');
+    // 支持Kimi API (Moonshot)
+    const isKimi = apiKey.includes('moonshot') || apiKey.startsWith('sk-');
     const apiUrl = isKimi 
       ? 'https://api.moonshot.cn/v1/chat/completions'
       : 'https://api.openai.com/v1/chat/completions';

@@ -1,0 +1,22 @@
+[
+  {
+    "category": "Task Response",
+    "bands": [
+      {
+        "band": 9,
+        "en": "Fully addresses all parts of the task. Presents a fully developed position in answer to the question with relevant, fully extended and well supported ideas.",
+        "zh": "完全回应所有任务要求，观点发展充分，论证有力。"
+      },
+      {
+        "band": 8,
+        "en": "Covers all parts of the task. Presents a well-developed response to the question with relevant, extended and supported ideas.",
+        "zh": "覆盖所有任务点，回应完整，支持充分。"
+      },
+      {
+        "band": 7,
+        "en": "Addresses all parts of the task. Presents a clear position throughout the response. Presents, extends and supports main ideas, but there may be a tendency to overgeneralise and/or supporting ideas may lack focus.",
+        "zh": "回应完整，立场清晰，观点支持较好，可能略泛化或不够集中。"
+      }
+    ]
+  }
+]

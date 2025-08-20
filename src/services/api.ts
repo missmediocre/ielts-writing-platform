@@ -1,11 +1,16 @@
 import type { IELTSWriting, IELTSScore } from '../types/ielts';
-
-const API_BASE_URL = import.meta.env.PROD 
-  ? window.location.origin + '/api' 
-  : 'http://localhost:3000/api';
+import { OpenAIo5ScoringService } from './openaiScoring';
+import { OfficialScoringService } from './officialScoringStandards';
 
 export class APIService {
   private static instance: APIService;
+  private openAIService: OpenAIo5ScoringService;
+  private useOpenAI: boolean;
+
+  constructor() {
+    this.openAIService = OpenAIo5ScoringService.getInstance();
+    this.useOpenAI = !!import.meta.env.VITE_OPENAI_API_KEY || !!process.env.OPENAI_API_KEY;
+  }
 
   static getInstance(): APIService {
     if (!APIService.instance) {
@@ -14,46 +19,27 @@ export class APIService {
     return APIService.instance;
   }
 
-  async scoreEssay(essay: IELTSWriting): Promise<IELTSScore> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/score-essay`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: essay.content,
-          wordCount: essay.wordCount,
-          taskType: essay.taskType || 'Task 2'
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to score essay');
+  async scoreEssay(essay: IELTSWriting, taskTitle?: string): Promise<IELTSScore> {
+    if (this.useOpenAI) {
+      try {
+        console.log('🤖 Using OpenAI o5 model for scoring...');
+        return await this.openAIService.scoreEssayWitho5(essay, taskTitle || 'General Task');
+      } catch (error) {
+        console.error('OpenAI o5 scoring failed:', error);
+        console.log('🔄 Falling back to official scoring...');
+        return await OfficialScoringService.scoreEssayOfficially(essay, taskTitle || 'General Task');
       }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('API scoring failed:', error);
-      
-      // 提供友好的错误消息和默认评分
-      if (error instanceof Error) {
-        throw new Error(`评分服务暂时不可用: ${error.message}`);
-      }
-      
-      throw new Error('无法连接到评分服务，请稍后重试');
+    } else {
+      console.log('📊 Using local official scoring...');
+      return await OfficialScoringService.scoreEssayOfficially(essay, taskTitle || 'General Task');
     }
   }
 
   async healthCheck(): Promise<boolean> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/health`);
-      return response.ok;
-    } catch {
-      return false;
+    if (this.useOpenAI) {
+      return await this.openAIService.healthCheck();
     }
+    return true;
   }
 }
 
@@ -69,7 +55,7 @@ export class IELTSScoringService {
     return IELTSScoringService.instance;
   }
 
-  async scoreEssay(essay: IELTSWriting): Promise<IELTSScore> {
-    return this.apiService.scoreEssay(essay);
+  async scoreEssay(essay: IELTSWriting, taskTitle?: string): Promise<IELTSScore> {
+    return this.apiService.scoreEssay(essay, taskTitle);
   }
 }

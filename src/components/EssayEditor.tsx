@@ -1,14 +1,17 @@
 import React from 'react';
 import { useWritingStore } from '../store/writingStore';
-import { Clock, Target, BookOpen } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import Timer from './Timer';
+import TaskSelector from './TaskSelector';
 
-export const EssayEditor: React.FC = () => {
+const EssayEditor: React.FC = () => {
   const {
     currentTask,
     currentEssay,
     updateEssayContent,
     isLoading,
     error,
+    refreshTask,
   } = useWritingStore();
 
   if (!currentTask) {
@@ -24,28 +27,11 @@ export const EssayEditor: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      {/* Task Header */}
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">{currentTask.title}</h2>
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1" />
-              <span>{currentTask.timeLimit} min</span>
-            </div>
-            <div className="flex items-center">
-              <Target className="w-4 h-4 mr-1" />
-              <span>{currentTask.wordCount.min}-{currentTask.wordCount.max} words</span>
-            </div>
-            <div className="flex items-center">
-              <BookOpen className="w-4 h-4 mr-1" />
-              <span className="capitalize">{currentTask.category}</span>
-            </div>
-          </div>
-        </div>
-        
-        <p className="text-gray-700 leading-relaxed">{currentTask.description}</p>
-      </div>
+      {/* Timer */}
+      <Timer />
+      
+      {/* Task Selector */}
+      <TaskSelector />
 
       {/* Writing Interface */}
       <div className="bg-white rounded-lg shadow-sm border">
@@ -62,6 +48,14 @@ export const EssayEditor: React.FC = () => {
                   style={{ width: `${progress}%` }}
                 />
               </div>
+              <button
+                onClick={refreshTask}
+                className="flex items-center px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                title="换一道新题"
+              >
+                <RefreshCw size={16} className="mr-1" />
+                换题
+              </button>
             </div>
           </div>
         </div>
@@ -97,3 +91,5 @@ export const EssayEditor: React.FC = () => {
     </div>
   );
 };
+
+export default EssayEditor;

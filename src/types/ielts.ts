@@ -16,6 +16,8 @@ export interface IELTSWriting {
   id: string;
   userId: string;
   taskId: string;
+  taskTitle?: string;
+  taskCategory?: string;
   content: string;
   wordCount: number;
   createdAt: string;

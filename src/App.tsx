@@ -3,8 +3,8 @@ import { useWritingStore } from './store/writingStore';
 import { Send, BookOpen } from 'lucide-react';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
-const EssayEditor = lazy(() => import('./components/EssayEditor').then(mod => ({ default: mod.EssayEditor })));
-const ScoreDisplay = lazy(() => import('./components/ScoreDisplay').then(mod => ({ default: mod.ScoreDisplay })));
+const EssayEditor = lazy(() => import('./components/EssayEditor'));
+const ScoreDisplay = lazy(() => import('./components/ScoreDisplay'));
 
 function App() {
   const [activeTab, setActiveTab] = useState<'write' | 'scores'>('write');
